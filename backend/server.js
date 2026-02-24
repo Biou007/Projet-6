@@ -4,11 +4,17 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const authRoutes = require("./routes/auth");
+const bookRoutes = require("./routes/books");
 
 const app = express();
 
 app.use(express.json());
+
+app.use("/images", express.static("images"));
+
 app.use("/api/auth", authRoutes);
+
+app.use("/api/books", bookRoutes);
 
 // Connexion à MongoDB
 mongoose
