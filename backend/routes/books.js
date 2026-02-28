@@ -21,4 +21,7 @@ router.put("/:id", auth, multer, booksCtrl.updateBook);
 // DELETE
 router.delete("/:id", auth, booksCtrl.deleteBook);
 
+// NOTE
+router.post("/:id/rating", auth, booksCtrl.rateBook);
+
 module.exports = router;
