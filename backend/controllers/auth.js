@@ -14,9 +14,13 @@ exports.signup = async (req, res) => {
 
     await user.save();
 
-    res.status(201).json({ message: "Utilisateur créé !" });
+    return res.status(201).json({ message: "Utilisateur créé !" });
   } catch (error) {
-    res.status(400).json({ error });
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: "Cet email est déjà utilisé." });
+    }
+
+    return res.status(500).json({ message: "Erreur serveur." });
   }
 };
 
@@ -39,11 +43,11 @@ exports.login = async (req, res) => {
       expiresIn: "24h",
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       userId: user.id,
       token,
     });
   } catch (error) {
-    res.status(500).json({ error });
+    return res.status(500).json({ message: "Erreur serveur." });
   }
 };

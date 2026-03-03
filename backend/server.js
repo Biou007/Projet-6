@@ -2,11 +2,14 @@ require("dotenv").config(); // Permet de lire le fichier .env
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
 const bookRoutes = require("./routes/books");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 

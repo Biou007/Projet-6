@@ -9,11 +9,14 @@ const booksCtrl = require("../controllers/books");
 // CREATE
 router.post("/", auth, multer, booksCtrl.createBook);
 
+// BEST RATING
+router.get("/bestrating", booksCtrl.getBestRatedBooks);
+
 // READ ALL
-router.get("/", auth, booksCtrl.getAllBooks);
+router.get("/", booksCtrl.getAllBooks);
 
 // READ ONE
-router.get("/:id", auth, booksCtrl.getOneBook);
+router.get("/:id", booksCtrl.getOneBook);
 
 // UPDATE
 router.put("/:id", auth, multer, booksCtrl.updateBook);

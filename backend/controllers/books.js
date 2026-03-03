@@ -1,27 +1,27 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const Book = require("../models/book");
 
 // CREATE
 exports.createBook = async (req, res) => {
   try {
+    const bookObject = JSON.parse(req.body.book);
+
     const imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
 
     const book = new Book({
+      ...bookObject,
       userId: req.userId,
-      title: req.body.title,
-      author: req.body.author,
-      year: req.body.year,
-      genre: req.body.genre,
       imageUrl,
       ratings: [],
       averageRating: 0,
     });
 
     await book.save();
-    res.status(201).json({ message: "Livre enregistré en base !" });
+    return res.status(201).json({ message: "Livre enregistré !" });
   } catch (error) {
-    res.status(500).json({ error });
+    console.log("ERREUR CREATE BOOK:", error);
+    return res.status(500).json({ message: "Erreur serveur." });
   }
 };
 
@@ -73,9 +73,9 @@ exports.updateBook = async (req, res) => {
       },
     );
 
-    res.status(200).json({ message: "Livre modifié !" });
+    return res.status(200).json({ message: "Livre modifié !" });
   } catch (error) {
-    res.status(500).json({ error });
+    return res.status(500).json({ error });
   }
 };
 
@@ -95,16 +95,13 @@ exports.deleteBook = async (req, res) => {
     const filename = book.imageUrl.split("/images/")[1];
     const filePath = path.join(__dirname, "..", "images", filename);
 
-    fs.unlink(filePath, async (error) => {
-      if (error) {
-        console.log("Erreur suppression image :", error);
-      }
+    await fs.unlink(filePath);
 
-      await Book.deleteOne({ _id: req.params.id });
-      res.status(200).json({ message: "Livre supprimé !" });
-    });
+    await Book.deleteOne({ _id: req.params.id });
+
+    return res.status(200).json({ message: "Livre supprimé !" });
   } catch (error) {
-    res.status(500).json({ error });
+    return res.status(500).json({ error });
   }
 };
 
@@ -147,7 +144,18 @@ exports.rateBook = async (req, res) => {
 
     await book.save();
 
-    res.status(201).json(book);
+    return res.status(201).json(book);
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+// GET BEST RATED
+exports.getBestRatedBooks = async (req, res) => {
+  try {
+    const books = await Book.find().sort({ averageRating: -1 }).limit(3);
+
+    res.status(200).json(books);
   } catch (error) {
     res.status(500).json({ error });
   }
